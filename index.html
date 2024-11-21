@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain & AI System</title>
+</head>
+<body>
+    <h1>Blockchain & AI-Based DV System</h1>
+    <h2>Add Data to Blockchain</h2>
+    <form id="blockForm">
+        <textarea id="blockData" placeholder="Enter block data" required></textarea>
+        <button type="submit">Add Block</button>
+    </form>
+    <h2>View Blockchain</h2>
+    <button id="viewBlockchain">View Blockchain</button>
+    <ul id="blockchainList"></ul>
+    <script>
+        document.getElementById('blockForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const blockData = document.getElementById('blockData').value;
+            await fetch('/add_block', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: blockData }),
+            });
+            alert('Block added successfully!');
+        });
+        document.getElementById('viewBlockchain').addEventListener('click', async () => {
+            const response = await fetch('/blockchain');
+            const blocks = await response.json();
+            const blockchainList = document.getElementById('blockchainList');
+            blockchainList.innerHTML = blocks.map(block => `<li>${block.data}</li>`).join('');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+from flask import Flask, request, jsonify
+import hashlib
+import datetime
+
+app = Flask(__name__)
+
+# Mock blockchain
+blockchain = []
+cases = []  # Case data for AI analysis
+
+# Create Genesis Block
+def create_genesis_block():
+    return {
+        'index': 0,
+        'timestamp': str(datetime.datetime.now()),
+        'data': "Genesis Block",
+        'previous_hash': "0",
+        'hash': hashlib.sha256("Genesis Block".encode()).hexdigest()
+    }
+
+blockchain.append(create_genesis_block())
+
+# Add new block to the blockchain
+@app.route('/add_block', methods=['POST'])
+def add_block():
+    data = request.json
+    previous_block = blockchain[-1]
+    block = {
+        'index': len(blockchain),
+        'timestamp': str(datetime.datetime.now()),
+        'data': data,
+        'previous_hash': previous_block['hash'],
+        'hash': hashlib.sha256(str(data).encode()).hexdigest()
+    }
+    blockchain.append(block)
+    return jsonify({"message": "Block added successfully!", "block": block}), 201
+
+# List all blockchain blocks
+@app.route('/blockchain', methods=['GET'])
+def get_blockchain():
+    return jsonify(blockchain), 200
+
+# Submit a DV case for AI analysis
+@app.route('/submit_case', methods=['POST'])
+def submit_case():
+    data = request.json
+    cases.append(data)
+    return jsonify({"message": "Case submitted for analysis.", "case": data}), 201
+
+# AI Risk Assessment (mocked)
+@app.route('/risk_assessment', methods=['GET'])
+def risk_assessment():
+    # Placeholder AI logic
+    analysis = [{"case_id": i, "risk_score": i * 10 % 100} for i in range(len(cases))]
+    return jsonify(analysis), 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
